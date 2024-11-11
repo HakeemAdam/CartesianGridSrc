@@ -16,6 +16,8 @@ protected:
     virtual OP_ERROR cookMySop(OP_Context &context);
 
 private:
-    
+    void createRectangularGrid(GU_Detail *gdp , int rows, int cols, float spacing);
+    void createTriangularGrid(GU_Detail *gdp , int rows, int cols, float spacing);
+    void createEquilateralTriGrid(GU_Detail *gdp , int rows, int cols, float spacing);
 };
 #endif
