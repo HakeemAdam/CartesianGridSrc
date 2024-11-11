@@ -18,6 +18,9 @@ protected:
 private:
     void createRectangularGrid(GU_Detail *gdp , int rows, int cols, float spacing);
     void createTriangularGrid(GU_Detail *gdp , int rows, int cols, float spacing);
-    void createEquilateralTriGrid(GU_Detail *gdp , int rows, int cols, float spacing);
+    void createEquilateralTriGrid(GU_Detail *gdp , int rows, int cols, float spacing, bool addCenter);
+
+    void createRadialGrid(GU_Detail *gdp , int rings, int segments, float spacing);
+    void createConcentricGrid(GU_Detail *gdp, int rings, int segments, float spacing);
 };
 #endif
