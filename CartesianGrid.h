@@ -16,11 +16,9 @@ protected:
     virtual OP_ERROR cookMySop(OP_Context &context);
 
 private:
-    void createRectangularGrid(GU_Detail *gdp , int rows, int cols, float spacing);
-    void createTriangularGrid(GU_Detail *gdp , int rows, int cols, float spacing);
-    void createEquilateralTriGrid(GU_Detail *gdp , int rows, int cols, float spacing, bool addCenter);
-
-    void createRadialGrid(GU_Detail *gdp , int rings, int segments, float spacing);
-    void createConcentricGrid(GU_Detail *gdp, int rings, int segments, float spacing);
+    void createRectangularGrid(GU_Detail *gdp , int rows, int cols, float spacing, UT_Vector3& center);
+    void createEquilateralTriGrid(GU_Detail *gdp , int rows, int cols, float spacing, bool addCenter, UT_Vector3& center);
+    void createConcentricGrid(GU_Detail *gdp, int rings, int segments, float spacing, bool useEvenSpacing, int minPoints, float spiralFactor, UT_Vector3& center);
+    void createHexagonalgrid(GU_Detail *gdp, int rows, int cols, float spacing, UT_Vector3& center);
 };
 #endif

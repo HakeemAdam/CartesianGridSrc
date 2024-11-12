@@ -88,3 +88,9 @@ build/ZERO_CHECK.vcxproj
 build/ZERO_CHECK.vcxproj.filters
 build/Release/CartesianGrid.exp
 /build
+CartesianGridSrc/Debug/vc143.pdb
+CartesianGridSrc/Debug/CartesianGridSrc.tlog/unsuccessfulbuild
+CartesianGridSrc/Debug/CartesianGridSrc.tlog/CL.command.1.tlog
+CartesianGridSrc/Debug/CartesianGridSrc.tlog/CartesianGridSrc.lastbuildstate
+CartesianGridSrc/Debug/CartesianGridSrc.obj
+CartesianGridSrc/Debug/vc143.idb
