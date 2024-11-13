@@ -1,5 +1,6 @@
 ﻿#include "CartesianGrid.h"
 #include "CartesianGrid.h"
+#include "CartesianGrid.h"
 
 #include <UT/UT_DSOVersion.h>
 
@@ -220,7 +221,7 @@ void CartesianGrid::createConcentricGrid(GU_Detail* gdp, int rings, int segments
     }
 }
 
-void CartesianGrid::createHexagonalgrid(GU_Detail* gdp, int rows, int cols, float spacing, UT_Vector3& center)
+void CartesianGrid::createHexagonalGrid(GU_Detail* gdp, int rows, int cols, float spacing, UT_Vector3& center)
 {
     GA_RWHandleV3 handle = gdp->addFloatTuple(GA_ATTRIB_POINT, "P",3);
     if(!handle.isValid())
@@ -256,6 +257,86 @@ void CartesianGrid::createHexagonalgrid(GU_Detail* gdp, int rows, int cols, floa
     }
 }
 
+void CartesianGrid::connectRectangularGrid(GU_Detail* gdp, int rows, int cols)
+{
+    int horizontalLines = (cols-1) * rows;
+    int verticalLines = cols * (rows - 1);
+    int totalLines   = horizontalLines + verticalLines;
+    GA_Offset vertexStart;
+
+    GA_Offset primStart = gdp->appendPrimitivesAndVertices(
+        GA_PRIMPOLY,
+        totalLines,
+        2,
+        vertexStart);
+
+    GA_Offset currentVtx = vertexStart;
+
+    for(int i=0; i< rows; i++)
+    {
+        for(int j=0; j< cols-1; j++)
+        {
+            int currentIdx = i*cols+j;
+            gdp->setVertexPoint(currentVtx++, currentIdx);
+            gdp->setVertexPoint(currentVtx++, currentIdx+1);
+        }
+    }
+
+    for(int i=0; i< rows-1; i++)
+    {
+        for(int j=0; j< cols; j++)
+        {
+            int currentIdx = i*cols+j;
+            gdp->setVertexPoint(currentVtx++, currentIdx);
+            gdp->setVertexPoint(currentVtx++, currentIdx+cols);
+        }
+    }
+    gdp->bumpAllDataIds();
+}
+
+void CartesianGrid::connectTriangularGrid(GU_Detail* gdp, int rows, int cols)
+{
+    int horizontalLines = (cols-1) * rows;
+    int diagonalLines =(cols-1) * (rows-1); 
+
+    int totalLines = diagonalLines + horizontalLines;
+    GA_Offset vertexStart;
+
+    GA_Offset primStart = gdp->appendPrimitivesAndVertices(
+        GA_PRIMPOLY,
+        totalLines,
+        2,
+        vertexStart);
+
+    GA_Offset currentVtx = vertexStart;
+
+    for(int row = 0; row < rows; row++)
+    {
+        for (int col = 0; col < cols-1; col++)
+        {
+            int currentIdx = row*cols + col;
+            gdp->setVertexPoint(currentVtx++, currentIdx);
+            gdp->setVertexPoint(currentVtx++, currentIdx+1);
+        }
+    }
+
+    for(int row = 0; row < rows-1; row++)
+    {
+        for (int col = 0; col < cols-1; col++)
+        {
+            int currentIdx = row*cols + col;
+            
+            
+            gdp->setVertexPoint(currentVtx++, currentIdx);
+            gdp->setVertexPoint(currentVtx++, currentIdx+ cols +1);
+           
+            
+        }
+    }
+
+    gdp->bumpAllDataIds();
+}
+
 
 OP_ERROR CartesianGrid::cookMySop(OP_Context& context)
 {
@@ -284,15 +365,17 @@ OP_ERROR CartesianGrid::cookMySop(OP_Context& context)
     {
         case 0:
             createRectangularGrid(gdp,rows,cols,spacing, center);
+            connectRectangularGrid(gdp,rows,cols);
             break;
         case 1:
             createEquilateralTriGrid(gdp,rows,cols,spacing, addCenter,center);
+            connectTriangularGrid(gdp,rows,cols);
             break;
         case 2:
             createConcentricGrid(gdp,rows,cols,spacing, useSpacing, minPoints, spiralFactor,center);
             break;
         case 3:
-            createHexagonalgrid(gdp,rows,cols,spacing,center);
+            createHexagonalGrid(gdp,rows,cols,spacing,center);
             break;
         default:
             createRectangularGrid(gdp,rows,cols,spacing,center);
