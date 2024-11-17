@@ -296,44 +296,57 @@ void CartesianGrid::connectRectangularGrid(GU_Detail* gdp, int rows, int cols)
 
 void CartesianGrid::connectTriangularGrid(GU_Detail* gdp, int rows, int cols)
 {
-    int horizontalLines = (cols-1) * rows;
-    int diagonalLines =(cols-1) * (rows-1); 
-
-    int totalLines = diagonalLines + horizontalLines;
+    int trianglesPerRow = (cols-1) * 2;  // Two triangles per column (up and down)
+    int totalTriangles = trianglesPerRow * (rows - 1);
+    
     GA_Offset vertexStart;
-
     GA_Offset primStart = gdp->appendPrimitivesAndVertices(
         GA_PRIMPOLY,
-        totalLines,
-        2,
-        vertexStart);
-
+        totalTriangles,
+        3,
+        vertexStart
+    );
+    
     GA_Offset currentVtx = vertexStart;
-
-    for(int row = 0; row < rows; row++)
-    {
-        for (int col = 0; col < cols-1; col++)
-        {
-            int currentIdx = row*cols + col;
-            gdp->setVertexPoint(currentVtx++, currentIdx);
-            gdp->setVertexPoint(currentVtx++, currentIdx+1);
-        }
-    }
-
+    
     for(int row = 0; row < rows-1; row++)
     {
-        for (int col = 0; col < cols-1; col++)
+        for(int col = 0; col < cols-1; col++)
         {
             int currentIdx = row*cols + col;
+            int nextRowIdx = (row+1)*cols + col;
             
-            
-            gdp->setVertexPoint(currentVtx++, currentIdx);
-            gdp->setVertexPoint(currentVtx++, currentIdx+ cols +1);
-           
-            
+            // For even-numbered rows
+            if(row % 2 == 0)
+            {
+                // Triangle pointing up
+                gdp->setVertexPoint(currentVtx++, currentIdx);
+                gdp->setVertexPoint(currentVtx++, currentIdx + 1);
+                gdp->setVertexPoint(currentVtx++, nextRowIdx);
+                
+                // Triangle pointing down
+                gdp->setVertexPoint(currentVtx++, currentIdx + 1);
+                gdp->setVertexPoint(currentVtx++, nextRowIdx + 1);
+                gdp->setVertexPoint(currentVtx++, nextRowIdx);
+            }
+            // For odd-numbered rows (shifted pattern)
+            else
+            {
+                // Triangle pointing up
+                gdp->setVertexPoint(currentVtx++, currentIdx);
+                gdp->setVertexPoint(currentVtx++, currentIdx + 1);
+                gdp->setVertexPoint(currentVtx++, nextRowIdx + 1);
+                
+                // Triangle pointing down
+                gdp->setVertexPoint(currentVtx++, currentIdx);
+                gdp->setVertexPoint(currentVtx++, nextRowIdx + 1);
+                gdp->setVertexPoint(currentVtx++, nextRowIdx);
+
+                
+            }
         }
     }
-
+    
     gdp->bumpAllDataIds();
 }
 
@@ -365,11 +378,11 @@ OP_ERROR CartesianGrid::cookMySop(OP_Context& context)
     {
         case 0:
             createRectangularGrid(gdp,rows,cols,spacing, center);
-            connectRectangularGrid(gdp,rows,cols);
+            //connectRectangularGrid(gdp,rows,cols);
             break;
         case 1:
             createEquilateralTriGrid(gdp,rows,cols,spacing, addCenter,center);
-            connectTriangularGrid(gdp,rows,cols);
+            //connectTriangularGrid(gdp,rows,cols);
             break;
         case 2:
             createConcentricGrid(gdp,rows,cols,spacing, useSpacing, minPoints, spiralFactor,center);
